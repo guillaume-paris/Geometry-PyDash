@@ -1,6 +1,7 @@
 import pygame
 from settings.config import *
-from states.game_state import GameState
+from states.GameStates import GameState
+from utils.inputs import listen_common_inputs
 
 # pygame setup
 pygame.init()
@@ -8,15 +9,15 @@ screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 clock = pygame.time.Clock()
 
 game_state = GameState(screen)
-game_state.set_state("started")
 
 running = True
 
 while running:
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            running = False
-    screen.fill("black")
+    # Common inputs
+    running = listen_common_inputs(running)
+
+    # Core game
+    game_state.run()
 
     pygame.display.flip()
     clock.tick(FRAME_RATE)

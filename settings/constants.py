@@ -1,8 +1,7 @@
-BACKGROUND_SPEED = 2
-GROUNDFLOOR_SPEED = 4
-PLAYER_SPEED = 5
-PLAYER_SIZE = 40
-GRAVITY = 0.5
+from pygame.math import Vector2
+
+PlAYER_SPEED = 6
+GRAVITY = Vector2(0, 0.86)
 WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
 RED = (255, 0, 0)
