@@ -7,11 +7,10 @@ from settings.constants import *
 from utils.level import init_level
 
 
-
 class GameLaunched:
-    def __init__(self, screen):
+    def __init__(self, screen, set_running):
         self.screen = screen
-        self.running = True
+        self.set_running = set_running
 
         # Level
         self.level = []
@@ -31,7 +30,7 @@ class GameLaunched:
         pygame.display.set_icon(avatar)
 
         # Player
-        self.player = Player(avatar, self.elements, (150, 150), self.player_sprites)
+        self.player = Player(screen, avatar, self.elements, (150, 150), self.player_sprites)
 
     def set_level(self, level: [str]):
         self.level = level
@@ -51,15 +50,20 @@ class GameLaunched:
     def draw(self):
         self.player_sprites.update()
         self.screen.blit(self.bg, (0, 0))
-        self.player_sprites.draw(self.screen)
+        if self.player.isJump:
+            self.player.draw_player_jump()
+        else:
+            self.player_sprites.draw(self.screen)
         self.elements.draw(self.screen)
 
     def handle_inputs(self):
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                self.running = False
+                self.set_running(False)
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
-                    self.running = False
-                if event.key == pygame.K_SPACE:
-                    self.running = False
+                    self.set_running(False)
+
+        keys = pygame.key.get_pressed()
+        if keys[pygame.K_SPACE] or keys[pygame.K_UP]:
+            self.player.jump()

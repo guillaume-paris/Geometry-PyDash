@@ -1,7 +1,6 @@
 import pygame
 from settings.config import *
 from states.GameStates import GameState
-from utils.inputs import listen_common_inputs
 
 # pygame setup
 pygame.init()
@@ -10,13 +9,9 @@ clock = pygame.time.Clock()
 
 game_state = GameState(screen)
 
-running = True
-
-while running:
-    # Common inputs
-    running = listen_common_inputs(running)
-
+while game_state.is_running():
     # Core game
+
     game_state.run()
 
     pygame.display.flip()

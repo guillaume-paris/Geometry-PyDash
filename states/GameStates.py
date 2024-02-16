@@ -9,11 +9,18 @@ from utils.level import load_levels
 class GameState:
     def __init__(self, screen):
         self.state = "started"
+        self.running = True
         self.screen = screen
         self.level = 1
-        self.levels = load_levels(["level_maps/level_1.csv", "level_maps/level_2.csv"])
-        self.gameLaunched = GameLaunched(self.screen)
+        self.levels = load_levels(["level_maps/level_test.csv", "level_maps/level_1.csv", "level_maps/level_2.csv"])
+        self.gameLaunched = GameLaunched(self.screen, self.set_running)
         self.gameLaunched.set_level(self.levels[0])
+
+    def is_running(self):
+        return self.running
+
+    def set_running(self, running):
+        self.running = running
 
     def set_state(self, state):
         self.state = state
