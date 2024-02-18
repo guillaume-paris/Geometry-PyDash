@@ -26,11 +26,12 @@ class Player(pygame.sprite.Sprite):
         self.screen = screen
         self.image = pygame.transform.smoothscale(image, (32, 32))
         self.rect = self.image.get_rect(center=pos)
-        self.jump_amount = 10
+        self.jump_amount = 11
         self.particles = []
         self.isJump = False
         self.vel = pygame.math.Vector2(0, 0)
         self.coins = 0
+        self.jump_rotat_angle = 0
 
     def jump(self):
         if self.onGround:
@@ -62,9 +63,8 @@ class Player(pygame.sprite.Sprite):
         surf.blit(rotated_image, origin)
 
     def draw_player_jump(self):
-        angle = 0
-        angle -= 8.1712
-        self.blitRotate(self.screen, self.image, self.rect.center, (16, 16), angle)
+        self.jump_rotat_angle -= 8.1712
+        self.blitRotate(self.screen, self.image, self.rect.center, (16, 16), self.jump_rotat_angle)
 
     def draw_particle_trail(self, x, y, color=(255, 255, 255)):
         """draws a trail of particle-rects in a line at random positions behind the player"""
@@ -92,10 +92,10 @@ class Player(pygame.sprite.Sprite):
                 sees if player is colliding with any obstacles"""
                 if isinstance(p, Orb) and (keys[pygame.K_UP] or keys[pygame.K_SPACE]):
                     pygame.draw.circle(self.alpha_surf, (255, 255, 0), p.rect.center, 18)
-                    self.screen.blit(pygame.image.load("images/editor-0.9s-47px.gif"), p.rect.center)
-                    self.jump_amount = 12  # gives a little boost when hit orb
-                    self.jump()
-                    self.jump_amount = 10  # return jump_amount to normal
+                    self.screen.blit(pygame.image.load("assets/images/editor-0.9s-47px.gif"), p.rect.center)
+                    self.jump_amount = 13  # gives a little boost when hit orb
+                    self.vel.y = -self.jump_amount
+                    self.jump_amount = 11  # return jump_amount to normal
 
                 if isinstance(p, End):
                     self.win = True
@@ -132,6 +132,11 @@ class Player(pygame.sprite.Sprite):
     def update(self):
         self.alpha_surf.fill((255, 255, 255, 1), special_flags=pygame.BLEND_RGBA_MULT)
 
+        if self.isJump:
+            if self.onGround:
+                """if player wants to jump and player is on the ground: only then is jump allowed"""
+                self.jump()
+
         if not self.onGround:
             self.vel += GRAVITY
 
@@ -143,6 +148,9 @@ class Player(pygame.sprite.Sprite):
 
         # increment in y direction
         self.rect.top += self.vel.y
+
+        # assuming player in the air, and if not it will be set to inversed after collide
+        self.onGround = False
 
         # do y-axis collisions
         self.collide(self.vel.y, self.platforms)
