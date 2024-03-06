@@ -5,6 +5,8 @@ from game.Player import Player
 from settings.config import *
 from settings.constants import *
 from utils.level import init_level
+from utils.sprites_load import coin
+from pygame.draw import rect
 
 
 class GameLaunched:
@@ -25,7 +27,10 @@ class GameLaunched:
         self.player_sprites = pygame.sprite.Group()
 
         # Stats
+        self.font_stats = pygame.font.Font("assets/fonts/PUSAB___.otf", 18)
         self.orbs_coords = []
+        self.attempts = 0
+        self.progression_bar = 0
 
         # Image load
         self.bg = pygame.image.load(os.path.join("assets/images", "bg.png"))
@@ -95,10 +100,36 @@ class GameLaunched:
         self.elements = pygame.sprite.Group()
         self.player = Player(self.screen, self.avatar, self.elements, (150, 150), self.player_sprites)
         self.set_level(self.level)
+        self.attempts += 1
+        self.progression_bar = 0
+
+    def draw_stats(self, money=0):
+        progress_colors = [pygame.Color("red"), pygame.Color("orange"), pygame.Color("yellow"),
+                           pygame.Color("lightgreen"),
+                           pygame.Color("green")]
+
+        tries = self.font_stats.render(f" Attempt {str(self.attempts)}", True, WHITE)
+        BAR_LENGTH = 600
+        BAR_HEIGHT = 10
+        player_position_percentage = 0.8 / self.level_width
+        if (self.progression_bar + player_position_percentage * BAR_LENGTH) <= BAR_LENGTH:
+            self.progression_bar += player_position_percentage * BAR_LENGTH
+
+        for i in range(1, money):
+            self.screen.blit(coin, (BAR_LENGTH, 25))
+
+        outline_rect = pygame.Rect(5, 5, BAR_LENGTH, BAR_HEIGHT)
+        fill_rect = pygame.Rect(5, 5, self.progression_bar, BAR_HEIGHT)
+        color_index = int(player_position_percentage * len(progress_colors))
+        col = progress_colors[min(color_index, len(progress_colors) - 1)]
+        rect(self.screen, col, fill_rect, 0, 4)
+        rect(self.screen, WHITE, outline_rect, 3, 4)
+        self.screen.blit(tries, (BAR_LENGTH + 8, 3))
 
     def draw(self):
         self.screen.blit(self.bg, (0, 0))
         self.player_sprites.update()
+        self.draw_stats(self.player.get_coins())
         if self.player.isJump:
             self.player.draw_player_jump()
         else:
@@ -119,6 +150,7 @@ class GameLaunched:
                 else:
                     if event.key == pygame.K_ESCAPE:
                         self.set_state("menu")
+                        self.attempts = 0
                         self.reset()
                     if event.key == pygame.K_r:
                         self.reset()

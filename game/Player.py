@@ -83,6 +83,11 @@ class Player(pygame.sprite.Sprite):
             if particle[2] <= 0:
                 self.particles.remove(particle)
 
+    def get_coins(self):
+        if self.coins >= 3:
+            return 3
+        return self.coins + 1
+
     def collide(self, axisPos, platforms):
         keys = pygame.key.get_pressed()
 
